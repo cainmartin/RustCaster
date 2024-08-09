@@ -1,3 +1,5 @@
+extern crate raycaster;
+
 mod defines;
 
 use crate::defines::*;

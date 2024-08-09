@@ -3,6 +3,12 @@ name = "rust_caster"
 version = "0.1.0"
 edition = "2021"
 
+[workspace]
+members = [
+    "raycaster",
+]
+
 [dependencies]
+raycaster = { path = "raycaster" }
 minifb = "0.27"
 rand = "0.8.5"

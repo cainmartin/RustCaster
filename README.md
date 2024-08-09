@@ -7,9 +7,9 @@ However, once it's up and running, feel free to download and try
 it out if you are looking for an example of a raycasting engine in Rust
 
 # Build
-'''
+```
 git clone https://github.com/cainmartin/rust_caster.git
 cd rust_caster
 cargo build --release
 cargo run --release
-'''
+```

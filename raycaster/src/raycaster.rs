@@ -1,3 +1,4 @@
+use crate::renderer::Renderer;
 
 pub struct Raycaster {
     time        : u128,
@@ -11,6 +12,7 @@ impl Raycaster {
     }
 
     pub fn run(&self) {
-
+        let renderer = Renderer::new();
+        renderer.render();
     }
 }

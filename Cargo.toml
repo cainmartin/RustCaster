@@ -10,5 +10,3 @@ members = [
 
 [dependencies]
 raycaster = { path = "raycaster" }
-minifb = "0.27"
-rand = "0.8.5"

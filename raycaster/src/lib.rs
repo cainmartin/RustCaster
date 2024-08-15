@@ -8,4 +8,5 @@ pub mod math;
 pub mod prelude {
     pub use crate::raycaster::Raycaster;
     pub use crate::world::World;
+    pub use crate::math::*;
 }

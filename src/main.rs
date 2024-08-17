@@ -21,10 +21,11 @@ fn main() {
     let file_path = "assets/maps/test_map.json";
     match load_json::<MapData>(file_path) {
         Ok(map_data) => {
+            println!("Map data:");
             println!("{:?}", map_data);
         }
         Err(e) => {
-            eprintln!("Faied to load map data: {}", e);
+            eprintln!("Failed to load map data: {}", e);
         }
     }
 

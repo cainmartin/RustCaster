@@ -12,6 +12,7 @@ impl Renderer {
         }
     }
 
+    // TODO: split up the render function so that we can tick this from the game engine
     pub fn render(&self) {
         let mut buffer: Vec<u32> = vec![0; WIDTH * HEIGHT];
 

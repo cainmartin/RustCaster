@@ -2,8 +2,8 @@ use crate::renderer::Renderer;
 use crate::world::World;
 
 pub struct Raycaster {
-    time        : u128,
-
+    time        : f64,
+    old_time    : f64,
     renderer    : Renderer,
     world       : World,
 }
@@ -11,7 +11,8 @@ pub struct Raycaster {
 impl Raycaster {
     pub fn new() -> Self {
         Self {
-            time: 0,
+            time: 0.0,
+            old_time: 0.0,
             renderer: Renderer::new(),
             world: World::new(),
         }

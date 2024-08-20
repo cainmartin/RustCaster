@@ -17,7 +17,7 @@ impl Camera {
     }
 
     pub fn move_forwards(&mut self, world: &World, speed: f32, delta: f32) {
-
+        
     }
 
     pub fn move_backwards(&mut self, world: &World, speed: f32, delta: f32) {

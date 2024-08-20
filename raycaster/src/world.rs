@@ -1,14 +1,45 @@
 
 pub struct World {
-    width: i32,
-    height: i32,
+    width: Option<i32>,
+    height: Option<i32>,
+    map: Option<Vec<u8>>,
 }
 
 impl World {
     pub fn new() -> Self {
+
         Self {
-            width: 20,
-            height: 20,
+            width: None,
+            height: None,
+            map: None,
         }
+    }
+
+    pub fn init(&mut self, width: i32, height: i32, map: Vec<u8>){
+        self.width = Some(width);
+        self.height = Some(height);
+        self.map = Some(map);
+    } 
+
+    pub fn is_initialized(&self) -> bool {
+        self.width.is_some() && self.height.is_some() && self.map.is_some()
+    }
+
+    pub fn is_collision(&self, xpos: i32, ypos: i32) -> bool {
+        // For now we will treat the uninitialized map as out of bounds
+        if !self.is_initialized() {
+            return true;
+        }
+
+        let width = self.width.unwrap();
+        let height = self.height.unwrap();
+
+        // Treat out of bounds as being a collision
+        if xpos < 0 || xpos >= width || ypos < 0 || ypos >= height {
+            return true;
+        }
+
+        let index = ypos * width + xpos;
+        self.map.as_ref().unwrap()[index as usize] != 0
     }
 }

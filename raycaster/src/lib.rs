@@ -5,9 +5,11 @@ pub mod renderer;
 pub mod player;
 pub mod math;
 pub mod utilities;
+pub mod camera;
 
 pub mod prelude {
     pub use crate::raycaster::Raycaster;
+    pub use crate::raycaster::MapData;
     pub use crate::world::World;
     pub use crate::math;
     pub use crate::utilities;

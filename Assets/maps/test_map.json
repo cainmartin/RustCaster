@@ -1,7 +1,11 @@
 {
     "player_start": {
-        "x": 2,
-        "y": 2
+        "x": 3,
+        "y": 3
+    },
+    "map_size": {
+        "width": 17,
+        "height": 8
     },
     "map_data": [
         "#################",

@@ -1,34 +1,22 @@
 use raycaster::prelude::Raycaster;
+use raycaster::prelude::MapData;
 use raycaster::prelude::utilities::load_json;
-use raycaster::prelude::math::Vec2;
-use serde::Deserialize;
-
-#[derive(Deserialize, Debug)]
-struct PlayerStart {
-    x: i32,
-    y: i32,
-}
-
-#[derive(Deserialize, Debug)]
-struct MapData {
-    player_start: PlayerStart,
-    map_data: Vec<String>,
-}
 
 fn main() {
     println!("Initializing rust_caster");
 
+    let mut rc = Raycaster::new();
+
     let file_path = "assets/maps/test_map.json";
     match load_json::<MapData>(file_path) {
         Ok(map_data) => {
-            println!("Map data:");
-            println!("{:?}", map_data);
+            println!("Map data loaded");
+            rc.init(&map_data);
         }
         Err(e) => {
             eprintln!("Failed to load map data: {}", e);
         }
     }
 
-    let rc = Raycaster::new();
     rc.run();
 }

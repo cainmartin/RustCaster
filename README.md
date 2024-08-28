@@ -1,4 +1,6 @@
-# rust_caster <WIP>
+# rust_caster WIP
+Please Note: This is a work in progress and is not currently in a functional
+state.
 A work in progress basic Rust based raycasting engine / game
 This is mostly a toy project to improve Rust skills, we will
 see if this grows into something bigger

@@ -1,6 +1,6 @@
 use crate::renderer::Renderer;
 use crate::world::World;
-use crate::player::Player;
+use crate::camera::Camera;
 use serde::Deserialize;
 use minifb::{Key, Window, WindowOptions };
 use crate::defines::*;
@@ -29,7 +29,7 @@ pub struct Raycaster {
     last_time   : Instant,
     renderer    : Renderer,
     window      : Window,
-    player      : Player,
+    camera      : Camera,
     world       : World,
 }
 
@@ -50,7 +50,7 @@ impl Raycaster {
             last_time: Instant::now(),
             renderer: Renderer::new(),
             window,
-            player: Player::new(),
+            camera: Camera::new(),
             world: World::new(),
         }
     }
@@ -65,7 +65,7 @@ impl Raycaster {
             .collect();
 
         self.world.init(width, height, map);
-        self.player.init(map_data.player_start.x, map_data.player_start.y);
+        self.camera.init(map_data.player_start.x, map_data.player_start.y);
     }
 
     pub fn run(&mut self) {
@@ -89,19 +89,19 @@ impl Raycaster {
 
     pub fn handle_input(&mut self, delta_time: f64) {
         if self.window.is_key_down(Key::W) {
-            self.player.move_forward(&self.world, delta_time);
+            self.camera.move_forward(&self.world, delta_time);
         }
 
         if self.window.is_key_down(Key::S) {
-            self.player.move_backwards(&self.world, delta_time);
+            self.camera.move_backward(&self.world, delta_time);
         }
 
         if self.window.is_key_down(Key::A) {
-            self.player.rotate_left(delta_time);
+            self.camera.rotate_left(delta_time);
         }
 
         if self.window.is_key_down(Key::D) {
-            self.player.rotate_right(delta_time);
+            self.camera.rotate_right(delta_time);
         }
     }
 

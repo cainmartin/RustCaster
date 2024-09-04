@@ -71,11 +71,93 @@ impl Raycaster {
     pub fn run(&mut self) {
         self.window.set_target_fps(FPS);
         
+        let mut pos_x = 3.0;
+        let mut pos_y = 3.0;
+        let mut dir_x = -1.0;
+        let mut dir_y = 0.0;
+        let mut plane_x = 0.0;
+        let mut plane_y = 0.66;
+
         while self.window.is_open() && !self.window.is_key_down(Key::Escape) {
             let now = Instant::now();
             let delta_time = now.duration_since(self.last_time).as_secs_f64();
             self.last_time = now;
 
+            // Get the screen rendering here for now - we will plug in the camera world later
+
+            for x in 0..WIDTH {
+                let camera_x = 2.0 * (x as f64) / (WIDTH as f64 - 1.0);
+                let ray_dir_x = dir_x + plane_x * camera_x;
+                let ray_dir_y = dir_y + plane_y * camera_x;
+
+                // Calculate the actual box of the map we are in
+                let mut map_x = pos_x as i32;
+                let mut map_y = pos_y as i32;
+
+                // Length of the ray from the current position, to next x or y-side
+                let mut side_dist_x = 0.0;
+                let mut side_dist_y = 0.0;
+
+                //length of ray from one x or y-side to next x or y-side
+                //these are derived as:
+                //deltaDistX = sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX))
+                //deltaDistY = sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY))
+                //which can be simplified to abs(|rayDir| / rayDirX) and abs(|rayDir| / rayDirY)
+                //where |rayDir| is the length of the vector (rayDirX, rayDirY). Its length,
+                //unlike (dirX, dirY) is not 1, however this does not matter, only the
+                //ratio between deltaDistX and deltaDistY matters, due to the way the DDA
+                //stepping further below works. So the values can be computed as below.
+                // Division through zero is prevented, even though technically that's not
+                // needed in C++ with IEEE 754 floating point values.
+
+                let mut delta_dist_x = if ray_dir_x == 0.0 {
+                    1e30
+                } else {
+                    (1.0 / ray_dir_x).abs() as f64
+                };
+
+                let mut delta_dist_y = if ray_dir_y == 0.0 { 
+                    1e30 
+                } else { 
+                    (1.0 / ray_dir_y).abs() as f64
+                };
+                
+                let mut perp_wall_dist = 0.0;
+
+                let mut step_x = 0;
+                let mut step_y = 0;
+
+                let mut hit = 1; // Was there a hit
+                let mut side = 0; // Was a NS or EW wall hit?
+
+                // Calculate step and initial side_dist
+                if ray_dir_x < 0.0 {
+                    step_x = -1;
+                    side_dist_x = (pos_x - map_x) * delta_dist_x;
+                } else {
+                    step_x = 1;
+                    side_dist_x = (map_x + 1.0 - pos_x) * delta_dist_x;
+                }
+
+                if ray_dir_y < 0.0 {
+                    step_y = -1;
+                    side_dist_y = (pos_y - map_y) * delta_dist_y;
+                } else {
+                    step_y = 1;
+                    side_dist_y = (map_y + 1.0 - pos_y) * delta_dist_y;
+                }
+            }
+
+            while hit == 0 {
+                // Here
+            }
+
+
+
+
+
+
+            // 
             self.handle_input(delta_time);
             self.update(delta_time);
             self.render(delta_time);

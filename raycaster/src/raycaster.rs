@@ -192,7 +192,7 @@ impl Raycaster {
 
                 let mut draw_end = line_height / 2 + (HEIGHT as i32) / 2;
                 if draw_end >= (HEIGHT as i32) {
-                    draw_start = (HEIGHT as i32) - 1;
+                    draw_end = (HEIGHT as i32) - 1;
                 }
 
                 let mut color = match self.world.get_cell(map_x, map_y) {

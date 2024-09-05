@@ -1,3 +1,4 @@
+use crate::color::*;
 
 pub struct World {
     width: Option<i32>,
@@ -40,6 +41,13 @@ impl World {
         }
 
         let index = ypos * width + xpos;
-        self.map.as_ref().unwrap()[index as usize] != 0
+        self.map.as_ref().unwrap()[index as usize] > 0
+    }
+
+    // TODO: This needs to have bounds checking
+    pub fn get_cell(&self, xpos: i32, ypos: i32) -> u8 {
+        let width = self.width.unwrap();
+        let index = ypos * width + xpos;
+        self.map.as_ref().unwrap()[index as usize]
     }
 }

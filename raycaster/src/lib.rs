@@ -5,6 +5,7 @@ pub mod renderer;
 pub mod math;
 pub mod utilities;
 pub mod camera;
+pub mod color;
 
 pub mod prelude {
     pub use crate::raycaster::Raycaster;

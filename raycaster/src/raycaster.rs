@@ -72,12 +72,12 @@ impl Raycaster {
     pub fn run(&mut self) {
         self.window.set_target_fps(FPS);
         
-        let mut pos_x = 3.0;
-        let mut pos_y = 3.0;
-        let mut dir_x = -1.0;
-        let mut dir_y = 0.0;
-        let mut plane_x = 0.0;
-        let mut plane_y = 0.66;
+        let mut pos_x: f64 = 5.0;
+        let mut pos_y: f64 = 5.0;
+        let mut dir_x: f64  = 1.0;
+        let mut dir_y: f64 = 0.0;
+        let mut plane_x: f64 = 0.0;
+        let mut plane_y: f64 = 0.66;
 
         while self.window.is_open() && !self.window.is_key_down(Key::Escape) {
             let now = Instant::now();
@@ -128,37 +128,37 @@ impl Raycaster {
                 let mut step_x = 0;
                 let mut step_y = 0;
 
-                let mut hit = 1; // Was there a hit
+                let mut hit = 0; // Was there a hit
                 let mut side = 0; // Was a NS or EW wall hit?
 
                 // Calculate step and initial side_dist
                 if ray_dir_x < 0.0 {
                     step_x = -1;
                     // TODO: delta_dist_x is f64 - need to verify this
-                    side_dist_x = (pos_x - (map_x as f32)) * (delta_dist_x as f32);
+                    side_dist_x = (pos_x - (map_x as f64)) * (delta_dist_x as f64);
                 } else {
                     step_x = 1;
-                    side_dist_x = ((map_x as f32) + 1.0 - pos_x) * (delta_dist_x as f32);
+                    side_dist_x = ((map_x as f64) + 1.0 - pos_x) * (delta_dist_x as f64);
                 }
 
                 if ray_dir_y < 0.0 {
                     step_y = -1;
-                    side_dist_y = (pos_y - (map_y as f32)) * (delta_dist_y as f32);
+                    side_dist_y = (pos_y - (map_y as f64)) * (delta_dist_y as f64);
                 } else {
                     step_y = 1;
-                    side_dist_y = ((map_y as f32) + 1.0 - pos_y) * (delta_dist_y as f32);
+                    side_dist_y = ((map_y as f64) + 1.0 - pos_y) * (delta_dist_y as f64);
                 }
 
 
                 while hit == 0 {
                     if side_dist_x < side_dist_y {
-                        side_dist_x = side_dist_x + (delta_dist_x as f32);
+                        side_dist_x = side_dist_x + (delta_dist_x as f64);
                         map_x = map_x + step_x;
                         side = 0;
                     }
                     else
                     {
-                        side_dist_y = side_dist_y + (delta_dist_y as f32);
+                        side_dist_y = side_dist_y + (delta_dist_y as f64);
                         map_y = map_y + step_y;
                         side = 1;
                     }
@@ -176,13 +176,13 @@ impl Raycaster {
                 // steps, but we subtract deltaDist once because one step more into the wall was taken above.
 
                 if side == 0 {
-                    perp_wall_dist = side_dist_x - (delta_dist_x as f32);
+                    perp_wall_dist = side_dist_x - delta_dist_x;
                 } else {
-                    perp_wall_dist = side_dist_y - (delta_dist_y as f32);
+                    perp_wall_dist = side_dist_y - delta_dist_y;
                 }
 
                 // Calculate height of line to draw on screen
-                let line_height = ((HEIGHT as f32) / perp_wall_dist) as i32;
+                let line_height = ((HEIGHT as f64) / perp_wall_dist) as i32;
 
                 // calculate lowest and highest pixel to fill in current stripe
                 let mut draw_start = -line_height / 2 + (HEIGHT as i32) / 2;
@@ -209,6 +209,47 @@ impl Raycaster {
 
                 self.renderer.draw_line(x as i32, draw_start, draw_end, &color);
             } // Draw screen
+
+            // TEMP MOVEMENT CODE - REMOVE
+
+            let move_speed = 5.0 * delta_time;
+            let rotate_speed = 3.0 * delta_time;
+
+            if self.window.is_key_down(Key::W) {
+                if self.world.is_collision((pos_x + dir_x) as i32, pos_y as i32) == false {
+                    pos_x += dir_x * move_speed;
+                }
+                if self.world.is_collision(pos_x as i32, (pos_y + dir_y) as i32) == false {
+                    pos_y += dir_y * move_speed;
+                }
+            }
+
+            if self.window.is_key_down(Key::S) {
+                if self.world.is_collision((pos_x - dir_x) as i32, pos_y as i32) == false {
+                    pos_x -= dir_x * move_speed;
+                }
+                if self.world.is_collision(pos_x as i32, (pos_y - dir_y) as i32) == false {
+                    pos_y -= dir_y * move_speed;
+                }
+            }
+
+            if self.window.is_key_down(Key::D) {
+                let old_dir_x = dir_x;
+                dir_x = dir_x * -rotate_speed.cos() - dir_x * -rotate_speed.sin();
+                dir_x = old_dir_x * -rotate_speed.sin() + dir_y * -rotate_speed.cos();
+                let old_plane_x = plane_x;
+                plane_x = plane_x * -rotate_speed.cos() - plane_y * -rotate_speed.sin();
+                plane_y = old_plane_x * -rotate_speed.sin() + plane_y * -rotate_speed.cos();
+            }
+
+            if self.window.is_key_down(Key::A) {
+                let old_dir_x = dir_x;
+                dir_x = dir_x * rotate_speed.cos() - dir_y * rotate_speed.sin();
+                dir_y = old_dir_x * rotate_speed.sin() + dir_y * rotate_speed.cos();
+                let old_plane_x = plane_x;
+                plane_x = plane_x * rotate_speed.cos() - plane_y * rotate_speed.sin();
+                plane_y = old_plane_x * rotate_speed.sin() + plane_y * rotate_speed.cos();
+            }
 
             // 
             self.handle_input(delta_time);

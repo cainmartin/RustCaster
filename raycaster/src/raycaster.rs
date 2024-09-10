@@ -62,13 +62,13 @@ impl Raycaster {
         let map: Vec<u8> = map_data
             .map_data
             .iter()
-            .flat_map(|s| s.chars().map(|c| match c {
-                '0' => 0,
-                '1' => 1,
-                '2' => 2,
-                '3' => 3,
-                '4' => 4,
-                _ => 255
+            .flat_map(|s| s.chars().filter_map(|c| match c {
+                '0' => Some(0),
+                '1' => Some(1),
+                '2' => Some(2),
+                '3' => Some(3),
+                '4' => Some(4),
+                _ => None,
             }))
             .collect();
 
@@ -79,8 +79,8 @@ impl Raycaster {
     pub fn run(&mut self) {
         self.window.set_target_fps(FPS);
         
-        let mut pos_x: f64 = 22.0;
-        let mut pos_y: f64 = 12.0;
+        let mut pos_x: f64 = 20.0;
+        let mut pos_y: f64 = 20.0;
         let mut dir_x: f64  = -1.0;
         let mut dir_y: f64 = 0.0;
         let mut plane_x: f64 = 0.0;

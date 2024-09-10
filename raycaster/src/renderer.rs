@@ -22,7 +22,7 @@ impl Renderer {
         &self.buffer
     }
 
-    fn clear_color(&mut self) {
+    pub(crate) fn clear_color(&mut self) {
         for pixel in self.buffer.iter_mut() {
             *pixel = 0x000000;
         }

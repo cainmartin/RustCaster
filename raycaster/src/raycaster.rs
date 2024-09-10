@@ -62,7 +62,14 @@ impl Raycaster {
         let map: Vec<u8> = map_data
             .map_data
             .iter()
-            .flat_map(|s| s.as_bytes().to_vec())
+            .flat_map(|s| s.chars().map(|c| match c {
+                '0' => 0,
+                '1' => 1,
+                '2' => 2,
+                '3' => 3,
+                '4' => 4,
+                _ => 255
+            }))
             .collect();
 
         self.world.init(width, height, map);
@@ -72,9 +79,9 @@ impl Raycaster {
     pub fn run(&mut self) {
         self.window.set_target_fps(FPS);
         
-        let mut pos_x: f64 = 5.0;
-        let mut pos_y: f64 = 5.0;
-        let mut dir_x: f64  = 1.0;
+        let mut pos_x: f64 = 22.0;
+        let mut pos_y: f64 = 12.0;
+        let mut dir_x: f64  = -1.0;
         let mut dir_y: f64 = 0.0;
         let mut plane_x: f64 = 0.0;
         let mut plane_y: f64 = 0.66;
@@ -86,8 +93,10 @@ impl Raycaster {
 
             // Get the screen rendering here for now - we will plug in the camera world later
 
+            self.renderer.clear_color();
+
             for x in 0..WIDTH {
-                let camera_x = 2.0 * (x as f64) / (WIDTH as f64 - 1.0);
+                let camera_x = 2.0 * (x as f64) / (WIDTH as f64) - 1.0;
                 let ray_dir_x = dir_x + plane_x * camera_x;
                 let ray_dir_y = dir_y + plane_y * camera_x;
 
@@ -235,11 +244,11 @@ impl Raycaster {
 
             if self.window.is_key_down(Key::D) {
                 let old_dir_x = dir_x;
-                dir_x = dir_x * -rotate_speed.cos() - dir_x * -rotate_speed.sin();
-                dir_x = old_dir_x * -rotate_speed.sin() + dir_y * -rotate_speed.cos();
+                dir_x = dir_x * (-rotate_speed).cos() - dir_y * (-rotate_speed).sin();
+                dir_y = old_dir_x * (-rotate_speed).sin() + dir_y * (-rotate_speed).cos();
                 let old_plane_x = plane_x;
-                plane_x = plane_x * -rotate_speed.cos() - plane_y * -rotate_speed.sin();
-                plane_y = old_plane_x * -rotate_speed.sin() + plane_y * -rotate_speed.cos();
+                plane_x = plane_x * (-rotate_speed).cos() - plane_y * (-rotate_speed).sin();
+                plane_y = old_plane_x * (-rotate_speed).sin() + plane_y * (-rotate_speed).cos();
             }
 
             if self.window.is_key_down(Key::A) {

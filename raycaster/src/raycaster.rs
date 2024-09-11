@@ -9,14 +9,14 @@ use std::time::Instant;
 
 #[derive(Deserialize, Debug)]
 struct PlayerStart {
-    x: f32,
-    y: f32,
+    x: f64,
+    y: f64,
 }
 
 #[derive(Deserialize, Debug)]
 struct MapSize {
-    width: i32,
-    height: i32,
+    width: i64,
+    height: i64,
 }
 
 #[derive(Deserialize, Debug)]
@@ -101,8 +101,8 @@ impl Raycaster {
                 let ray_dir_y = dir_y + plane_y * camera_x;
 
                 // Calculate the actual box of the map we are in
-                let mut map_x = pos_x as i32;
-                let mut map_y = pos_y as i32;
+                let mut map_x = pos_x as i64;
+                let mut map_y = pos_y as i64;
 
                 // Length of the ray from the current position, to next x or y-side
                 let mut side_dist_x = 0.0;
@@ -134,45 +134,45 @@ impl Raycaster {
                 
                 let mut perp_wall_dist = 0.0;
 
-                let mut step_x = 0;
-                let mut step_y = 0;
+                let mut step_x : i64 = 0;
+                let mut step_y: i64 = 0;
 
-                let mut hit = 0; // Was there a hit
-                let mut side = 0; // Was a NS or EW wall hit?
+                let mut hit:i64 = 0; // Was there a hit
+                let mut side:i64 = 0; // Was a NS or EW wall hit?
 
                 // Calculate step and initial side_dist
                 if ray_dir_x < 0.0 {
                     step_x = -1;
                     // TODO: delta_dist_x is f64 - need to verify this
-                    side_dist_x = (pos_x - (map_x as f64)) * (delta_dist_x as f64);
+                    side_dist_x = (pos_x - (map_x as f64)) * delta_dist_x;
                 } else {
                     step_x = 1;
-                    side_dist_x = ((map_x as f64) + 1.0 - pos_x) * (delta_dist_x as f64);
+                    side_dist_x = ((map_x as f64) + 1.0 - pos_x) * delta_dist_x;
                 }
 
                 if ray_dir_y < 0.0 {
                     step_y = -1;
-                    side_dist_y = (pos_y - (map_y as f64)) * (delta_dist_y as f64);
+                    side_dist_y = (pos_y - (map_y as f64)) * (delta_dist_y);
                 } else {
                     step_y = 1;
-                    side_dist_y = ((map_y as f64) + 1.0 - pos_y) * (delta_dist_y as f64);
+                    side_dist_y = ((map_y as f64) + 1.0 - pos_y) * (delta_dist_y);
                 }
 
 
                 while hit == 0 {
                     if side_dist_x < side_dist_y {
-                        side_dist_x = side_dist_x + (delta_dist_x as f64);
+                        side_dist_x = side_dist_x + delta_dist_x;
                         map_x = map_x + step_x;
                         side = 0;
                     }
                     else
                     {
-                        side_dist_y = side_dist_y + (delta_dist_y as f64);
+                        side_dist_y = side_dist_y + delta_dist_y;
                         map_y = map_y + step_y;
                         side = 1;
                     }
 
-                    if self.world.is_collision(map_x, map_y) {
+                    if self.world.is_collision(map_x as i64, map_y as i64) {
                         hit = 1;
                     }
                 }
@@ -204,7 +204,7 @@ impl Raycaster {
                     draw_end = (HEIGHT as i32) - 1;
                 }
 
-                let mut color = match self.world.get_cell(map_x, map_y) {
+                let mut color = match self.world.get_cell(map_x as i64, map_y as i64) {
                     1 => RED_RGB,
                     2 => GREEN_RGB,
                     3 => BLUE_RGB,
@@ -225,19 +225,19 @@ impl Raycaster {
             let rotate_speed = 3.0 * delta_time;
 
             if self.window.is_key_down(Key::W) {
-                if self.world.is_collision((pos_x + dir_x) as i32, pos_y as i32) == false {
+                if self.world.is_collision((pos_x + dir_x) as i64, pos_y as i64) == false {
                     pos_x += dir_x * move_speed;
                 }
-                if self.world.is_collision(pos_x as i32, (pos_y + dir_y) as i32) == false {
+                if self.world.is_collision(pos_x as i64, (pos_y + dir_y) as i64) == false {
                     pos_y += dir_y * move_speed;
                 }
             }
 
             if self.window.is_key_down(Key::S) {
-                if self.world.is_collision((pos_x - dir_x) as i32, pos_y as i32) == false {
+                if self.world.is_collision((pos_x - dir_x) as i64, pos_y as i64) == false {
                     pos_x -= dir_x * move_speed;
                 }
-                if self.world.is_collision(pos_x as i32, (pos_y - dir_y) as i32) == false {
+                if self.world.is_collision(pos_x as i64, (pos_y - dir_y) as i64) == false {
                     pos_y -= dir_y * move_speed;
                 }
             }

@@ -2,9 +2,9 @@ use crate::world::World;
 use crate::math::Vec2;
 
 pub struct Camera {
-    pos: Vec2,
-    dir: Vec2,
-    plane: Vec2,
+    pub(crate) pos: Vec2,
+    pub(crate) dir: Vec2,
+    pub(crate) plane: Vec2,
     _fov: f64,
     _move_speed: f64,
     _rotation_speed: f64,

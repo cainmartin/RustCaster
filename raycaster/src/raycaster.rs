@@ -79,12 +79,12 @@ impl Raycaster {
     pub fn run(&mut self) {
         self.window.set_target_fps(FPS);
         
-        let mut pos_x: f64 = 20.0;
-        let mut pos_y: f64 = 20.0;
-        let mut dir_x: f64  = -1.0;
-        let mut dir_y: f64 = 0.0;
-        let mut plane_x: f64 = 0.0;
-        let mut plane_y: f64 = 0.66;
+        // let mut pos_x: f64 = 20.0;
+        // let mut pos_y: f64 = 20.0;
+        // let mut dir_x: f64  = -1.0;
+        // let mut dir_y: f64 = 0.0;
+        // let mut plane_x: f64 = 0.0;
+        // let mut plane_y: f64 = 0.66;
 
         while self.window.is_open() && !self.window.is_key_down(Key::Escape) {
             let now = Instant::now();
@@ -97,12 +97,12 @@ impl Raycaster {
 
             for x in 0..WIDTH {
                 let camera_x = 2.0 * (x as f64) / (WIDTH as f64) - 1.0;
-                let ray_dir_x = dir_x + plane_x * camera_x;
-                let ray_dir_y = dir_y + plane_y * camera_x;
+                let ray_dir_x = self.camera.dir.x + self.camera.plane.x * camera_x;
+                let ray_dir_y = self.camera.dir.y + self.camera.plane.y * camera_x;
 
                 // Calculate the actual box of the map we are in
-                let mut map_x = pos_x as i64;
-                let mut map_y = pos_y as i64;
+                let mut map_x = self.camera.pos.x as i64;
+                let mut map_y = self.camera.pos.y as i64;
 
                 // Length of the ray from the current position, to next x or y-side
                 let mut side_dist_x = 0.0;
@@ -144,18 +144,18 @@ impl Raycaster {
                 if ray_dir_x < 0.0 {
                     step_x = -1;
                     // TODO: delta_dist_x is f64 - need to verify this
-                    side_dist_x = (pos_x - (map_x as f64)) * delta_dist_x;
+                    side_dist_x = (self.camera.pos.x - (map_x as f64)) * delta_dist_x;
                 } else {
                     step_x = 1;
-                    side_dist_x = ((map_x as f64) + 1.0 - pos_x) * delta_dist_x;
+                    side_dist_x = ((map_x as f64) + 1.0 - self.camera.pos.x) * delta_dist_x;
                 }
 
                 if ray_dir_y < 0.0 {
                     step_y = -1;
-                    side_dist_y = (pos_y - (map_y as f64)) * (delta_dist_y);
+                    side_dist_y = (self.camera.pos.y - (map_y as f64)) * (delta_dist_y);
                 } else {
                     step_y = 1;
-                    side_dist_y = ((map_y as f64) + 1.0 - pos_y) * (delta_dist_y);
+                    side_dist_y = ((map_y as f64) + 1.0 - self.camera.pos.y) * (delta_dist_y);
                 }
 
 
@@ -225,43 +225,43 @@ impl Raycaster {
             let rotate_speed = 3.0 * delta_time;
 
             if self.window.is_key_down(Key::W) {
-                if self.world.is_collision((pos_x + dir_x) as i64, pos_y as i64) == false {
-                    pos_x += dir_x * move_speed;
+                if self.world.is_collision((self.camera.pos.x + self.camera.dir.x) as i64, self.camera.pos.y as i64) == false {
+                    self.camera.pos.x += self.camera.dir.x * move_speed;
                 }
-                if self.world.is_collision(pos_x as i64, (pos_y + dir_y) as i64) == false {
-                    pos_y += dir_y * move_speed;
+                if self.world.is_collision(self.camera.pos.x as i64, (self.camera.pos.y + self.camera.dir.y) as i64) == false {
+                    self.camera.pos.y += self.camera.dir.y * move_speed;
                 }
             }
 
             if self.window.is_key_down(Key::S) {
-                if self.world.is_collision((pos_x - dir_x) as i64, pos_y as i64) == false {
-                    pos_x -= dir_x * move_speed;
+                if self.world.is_collision((self.camera.pos.x - self.camera.dir.x) as i64, self.camera.pos.y as i64) == false {
+                    self.camera.pos.x -= self.camera.dir.x * move_speed;
                 }
-                if self.world.is_collision(pos_x as i64, (pos_y - dir_y) as i64) == false {
-                    pos_y -= dir_y * move_speed;
+                if self.world.is_collision(self.camera.pos.x as i64, (self.camera.pos.y - self.camera.dir.y) as i64) == false {
+                    self.camera.pos.y -= self.camera.dir.y * move_speed;
                 }
             }
 
             if self.window.is_key_down(Key::D) {
-                let old_dir_x = dir_x;
-                dir_x = dir_x * (-rotate_speed).cos() - dir_y * (-rotate_speed).sin();
-                dir_y = old_dir_x * (-rotate_speed).sin() + dir_y * (-rotate_speed).cos();
-                let old_plane_x = plane_x;
-                plane_x = plane_x * (-rotate_speed).cos() - plane_y * (-rotate_speed).sin();
-                plane_y = old_plane_x * (-rotate_speed).sin() + plane_y * (-rotate_speed).cos();
+                let old_dir_x = self.camera.dir.x;
+                self.camera.dir.x = self.camera.dir.x * (-rotate_speed).cos() - self.camera.dir.y * (-rotate_speed).sin();
+                self.camera.dir.y = old_dir_x * (-rotate_speed).sin() + self.camera.dir.y * (-rotate_speed).cos();
+                let old_plane_x = self.camera.plane.x;
+                self.camera.plane.x = self.camera.plane.x * (-rotate_speed).cos() - self.camera.plane.y * (-rotate_speed).sin();
+                self.camera.plane.y = old_plane_x * (-rotate_speed).sin() + self.camera.plane.y * (-rotate_speed).cos();
             }
 
             if self.window.is_key_down(Key::A) {
-                let old_dir_x = dir_x;
-                dir_x = dir_x * rotate_speed.cos() - dir_y * rotate_speed.sin();
-                dir_y = old_dir_x * rotate_speed.sin() + dir_y * rotate_speed.cos();
-                let old_plane_x = plane_x;
-                plane_x = plane_x * rotate_speed.cos() - plane_y * rotate_speed.sin();
-                plane_y = old_plane_x * rotate_speed.sin() + plane_y * rotate_speed.cos();
+                let old_dir_x = self.camera.dir.x;
+                self.camera.dir.x = self.camera.dir.x * rotate_speed.cos() - self.camera.dir.y * rotate_speed.sin();
+                self.camera.dir.y = old_dir_x * rotate_speed.sin() + self.camera.dir.y * rotate_speed.cos();
+                let old_plane_x = self.camera.plane.x;
+                self.camera.plane.x = self.camera.plane.x * rotate_speed.cos() - self.camera.plane.y * rotate_speed.sin();
+                self.camera.plane.y = old_plane_x * rotate_speed.sin() + self.camera.plane.y * rotate_speed.cos();
             }
 
             // 
-            self.handle_input(delta_time);
+            // self.handle_input(delta_time);
             self.update(delta_time);
             self.render(delta_time);
 

@@ -78,21 +78,11 @@ impl Raycaster {
 
     pub fn run(&mut self) {
         self.window.set_target_fps(FPS);
-        
-        // let mut pos_x: f64 = 20.0;
-        // let mut pos_y: f64 = 20.0;
-        // let mut dir_x: f64  = -1.0;
-        // let mut dir_y: f64 = 0.0;
-        // let mut plane_x: f64 = 0.0;
-        // let mut plane_y: f64 = 0.66;
 
         while self.window.is_open() && !self.window.is_key_down(Key::Escape) {
             let now = Instant::now();
             let delta_time = now.duration_since(self.last_time).as_secs_f64();
             self.last_time = now;
-
-            // Get the screen rendering here for now - we will plug in the camera world later
-
             self.renderer.clear_color();
 
             for x in 0..WIDTH {
@@ -107,18 +97,6 @@ impl Raycaster {
                 // Length of the ray from the current position, to next x or y-side
                 let mut side_dist_x = 0.0;
                 let mut side_dist_y = 0.0;
-
-                //length of ray from one x or y-side to next x or y-side
-                //these are derived as:
-                //deltaDistX = sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX))
-                //deltaDistY = sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY))
-                //which can be simplified to abs(|rayDir| / rayDirX) and abs(|rayDir| / rayDirY)
-                //where |rayDir| is the length of the vector (rayDirX, rayDirY). Its length,
-                //unlike (dirX, dirY) is not 1, however this does not matter, only the
-                //ratio between deltaDistX and deltaDistY matters, due to the way the DDA
-                //stepping further below works. So the values can be computed as below.
-                // Division through zero is prevented, even though technically that's not
-                // needed in C++ with IEEE 754 floating point values.
 
                 let mut delta_dist_x = if ray_dir_x == 0.0 {
                     1e30
@@ -158,7 +136,6 @@ impl Raycaster {
                     side_dist_y = ((map_y as f64) + 1.0 - self.camera.pos.y) * (delta_dist_y);
                 }
 
-
                 while hit == 0 {
                     if side_dist_x < side_dist_y {
                         side_dist_x = side_dist_x + delta_dist_x;
@@ -176,13 +153,6 @@ impl Raycaster {
                         hit = 1;
                     }
                 }
-
-                // Calculate distance projected on camera direction. This is the shortest distance from the point where the wall is
-                // hit to the camera plane. Euclidean to center camera point would give fisheye effect!
-                // This can be computed as (mapX - posX + (1 - stepX) / 2) / rayDirX for side == 0, or same formula with Y
-                // for size == 1, but can be simplified to the code below thanks to how sideDist and deltaDist are computed:
-                // because they were left scaled to |rayDir|. sideDist is the entire length of the ray above after the multiple
-                // steps, but we subtract deltaDist once because one step more into the wall was taken above.
 
                 if side == 0 {
                     perp_wall_dist = side_dist_x - delta_dist_x;
@@ -219,57 +189,14 @@ impl Raycaster {
                 self.renderer.draw_line(x as i32, draw_start, draw_end, &color);
             } // Draw screen
 
-            // TEMP MOVEMENT CODE - REMOVE
-
-            let move_speed = 5.0 * delta_time;
-            let rotate_speed = 3.0 * delta_time;
-
-            if self.window.is_key_down(Key::W) {
-                if self.world.is_collision((self.camera.pos.x + self.camera.dir.x) as i64, self.camera.pos.y as i64) == false {
-                    self.camera.pos.x += self.camera.dir.x * move_speed;
-                }
-                if self.world.is_collision(self.camera.pos.x as i64, (self.camera.pos.y + self.camera.dir.y) as i64) == false {
-                    self.camera.pos.y += self.camera.dir.y * move_speed;
-                }
-            }
-
-            if self.window.is_key_down(Key::S) {
-                if self.world.is_collision((self.camera.pos.x - self.camera.dir.x) as i64, self.camera.pos.y as i64) == false {
-                    self.camera.pos.x -= self.camera.dir.x * move_speed;
-                }
-                if self.world.is_collision(self.camera.pos.x as i64, (self.camera.pos.y - self.camera.dir.y) as i64) == false {
-                    self.camera.pos.y -= self.camera.dir.y * move_speed;
-                }
-            }
-
-            if self.window.is_key_down(Key::D) {
-                let old_dir_x = self.camera.dir.x;
-                self.camera.dir.x = self.camera.dir.x * (-rotate_speed).cos() - self.camera.dir.y * (-rotate_speed).sin();
-                self.camera.dir.y = old_dir_x * (-rotate_speed).sin() + self.camera.dir.y * (-rotate_speed).cos();
-                let old_plane_x = self.camera.plane.x;
-                self.camera.plane.x = self.camera.plane.x * (-rotate_speed).cos() - self.camera.plane.y * (-rotate_speed).sin();
-                self.camera.plane.y = old_plane_x * (-rotate_speed).sin() + self.camera.plane.y * (-rotate_speed).cos();
-            }
-
-            if self.window.is_key_down(Key::A) {
-                let old_dir_x = self.camera.dir.x;
-                self.camera.dir.x = self.camera.dir.x * rotate_speed.cos() - self.camera.dir.y * rotate_speed.sin();
-                self.camera.dir.y = old_dir_x * rotate_speed.sin() + self.camera.dir.y * rotate_speed.cos();
-                let old_plane_x = self.camera.plane.x;
-                self.camera.plane.x = self.camera.plane.x * rotate_speed.cos() - self.camera.plane.y * rotate_speed.sin();
-                self.camera.plane.y = old_plane_x * rotate_speed.sin() + self.camera.plane.y * rotate_speed.cos();
-            }
-
-            // 
-            // self.handle_input(delta_time);
+            self.handle_input(delta_time);
             self.update(delta_time);
             self.render(delta_time);
-
         } // Main loop
     } // run
 
     pub fn update(&self, _delta_time: f64) {
-
+        // Add game logic
     }
 
     pub fn handle_input(&mut self, delta_time: f64) {

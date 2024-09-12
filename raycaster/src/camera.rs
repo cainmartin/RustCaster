@@ -70,12 +70,12 @@ impl Camera {
         let speed = self._rotation_speed * delta_time;
 
         let old_dir_x = self.dir.x;
-        self.dir.x = self.dir.x * -speed.cos() - self.dir.y * -speed.sin();
-        self.dir.y = old_dir_x * -speed.sin() + self.dir.y * -speed.cos();
+        self.dir.x = self.dir.x * (-speed).cos() - self.dir.y * (-speed).sin();
+        self.dir.y = old_dir_x * (-speed).sin() + self.dir.y * (-speed).cos();
 
         // Rotate the plane
         let old_plane_x = self.plane.x;
-        self.plane.x = self.plane.x * -speed.cos() - self.plane.y * -speed.sin();
-        self.plane.y = old_plane_x * -speed.sin() + self.plane.y * -speed.cos();
+        self.plane.x = self.plane.x * (-speed).cos() - self.plane.y * (-speed).sin();
+        self.plane.y = old_plane_x * (-speed).sin() + self.plane.y * (-speed).cos();
     }
 }
